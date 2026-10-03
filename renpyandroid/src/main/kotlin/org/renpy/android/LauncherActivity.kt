@@ -1440,6 +1440,13 @@ class LauncherActivity : BaseActivity() {
                 launchActivityWindow(intent, AppInfoActivity::class.java.name)
             }
 
+            "tools" -> {
+                val intent = Intent().setClassName(this, "org.renpy.android.ToolsActivity").apply {
+                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                }
+                launchActivityWindow(intent, "org.renpy.android.ToolsActivity")
+            }
+
             "experiments" -> {
                 if (getActiveProfile() == ProfileNavigationHelper.PROFILE_RENPY_LAUNCHER) {
                     val intent = Intent(this, MineLauncherActivity::class.java).apply {

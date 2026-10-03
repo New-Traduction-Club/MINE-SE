@@ -281,6 +281,24 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutPickerFooter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:gravity="center"
+        android:background="@color/colorBackground"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnConfirmFolderSelection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/picker_select_folder"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout

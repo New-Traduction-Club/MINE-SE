@@ -36,6 +36,13 @@ open class FileExplorerActivity : GameWindowActivity() {
     companion object {
         private const val STATE_CURRENT_DIR_PATH = "state_current_dir_path"
         private const val SEARCH_DEBOUNCE_MS = 300L
+
+        const val EXTRA_PICKER_MODE = "extra_picker_mode"
+        const val EXTRA_PICKER_TYPE = "extra_picker_type"
+        const val PICKER_TYPE_FILE = "file"
+        const val PICKER_TYPE_FOLDER = "folder"
+        const val EXTRA_PICKER_EXTENSION = "extra_picker_extension"
+        const val EXTRA_SELECTED_PATH = "extra_selected_path"
     }
 
     private enum class ImportConflictAction {
@@ -68,7 +75,19 @@ open class FileExplorerActivity : GameWindowActivity() {
         binding = FileExplorerActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        setTitle(getString(R.string.title_file_explorer).lowercase())
+        val isPickerMode = intent.getBooleanExtra(EXTRA_PICKER_MODE, false)
+        val pickerType = intent.getStringExtra(EXTRA_PICKER_TYPE) ?: PICKER_TYPE_FILE
+        val pickerExtension = intent.getStringExtra(EXTRA_PICKER_EXTENSION)
+
+        if (isPickerMode) {
+            if (pickerType == PICKER_TYPE_FOLDER) {
+                setTitle(getString(R.string.picker_select_folder))
+            } else {
+                setTitle(getString(R.string.picker_select_file))
+            }
+        } else {
+            setTitle(getString(R.string.title_file_explorer).lowercase())
+        }
 
         SoundEffects.initialize(this)
 
@@ -81,6 +100,16 @@ open class FileExplorerActivity : GameWindowActivity() {
                         exitSearchMode(restoreDirectory = false)
                     }
                     viewModel.loadDirectory(file.absolutePath)
+                } else if (isPickerMode && pickerType == PICKER_TYPE_FILE) {
+                    val allowedExtensions = pickerExtension?.split(",")?.map { it.trim().lowercase() }
+                    val matches = allowedExtensions == null || allowedExtensions.any { ext -> file.name.lowercase().endsWith(ext) }
+                    if (matches) {
+                        val resultIntent = Intent().apply {
+                            putExtra(EXTRA_SELECTED_PATH, file.absolutePath)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
+                    }
                 } else {
                     val viewIntent = Intent(this, FileViewerActivity::class.java)
                     viewIntent.putExtra("file_path", file.absolutePath)
@@ -88,11 +117,32 @@ open class FileExplorerActivity : GameWindowActivity() {
                 }
             },
             onItemLongClick = { _ ->
-                SoundEffects.playClick(this)
-                updateActionUI()
+                if (!isPickerMode) {
+                    SoundEffects.playClick(this)
+                    updateActionUI()
+                }
             }
         )
         binding.recyclerView.adapter = fileAdapter
+
+        if (isPickerMode) {
+            binding.btnQuickAdd.visibility = View.GONE
+            binding.btnSystemFiles.visibility = View.GONE
+            if (pickerType == PICKER_TYPE_FOLDER) {
+                binding.layoutPickerFooter.visibility = View.VISIBLE
+                binding.btnConfirmFolderSelection.setOnClickListener {
+                    SoundEffects.playClick(this)
+                    val selected = viewModel.currentDir.value?.absolutePath ?: rootDir.absolutePath
+                    val resultIntent = Intent().apply {
+                        putExtra(EXTRA_SELECTED_PATH, selected)
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                    finish()
+                }
+            } else {
+                binding.layoutPickerFooter.visibility = View.GONE
+            }
+        }
 
         viewModel.files.observe(this) { files ->
             fileAdapter.submitList(files)
@@ -228,6 +278,15 @@ open class FileExplorerActivity : GameWindowActivity() {
     }
     
     private fun updateActionUI() {
+        val isPickerMode = intent.getBooleanExtra(EXTRA_PICKER_MODE, false)
+        if (isPickerMode) {
+            binding.actionContainer.visibility = View.GONE
+            binding.bottomAppBar.visibility = View.GONE
+            binding.btnMenu.visibility = View.GONE
+            binding.fabPaste.visibility = View.GONE
+            return
+        }
+
         val selectionCount = fileAdapter.getSelectedCount()
         var showExtract = false
         if (selectionCount == 1) {

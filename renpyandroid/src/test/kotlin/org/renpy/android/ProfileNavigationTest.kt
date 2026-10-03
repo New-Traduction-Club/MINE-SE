@@ -134,9 +134,9 @@ class ProfileNavigationTest {
         )
         assertEquals(R.string.title_mine, pinned[0].titleResId)
 
-        assertEquals(3, expanded.size)
+        assertEquals(4, expanded.size)
         assertEquals(
-            listOf("tc_blog", "app_info", "switch_user"),
+            listOf("tools", "tc_blog", "app_info", "switch_user"),
             expanded.map { it.actionId }
         )
     }

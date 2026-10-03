@@ -17,6 +17,7 @@ object RpaUtils {
     suspend fun extractGameAssets(
         rpaPath: String, 
         outputDir: File,
+        overwrite: Boolean = true,
         onProgress: ((String, Int, Int) -> Unit)? = null
     ) {
         withContext(Dispatchers.IO) {
@@ -34,6 +35,9 @@ object RpaUtils {
                     onProgress?.invoke(fileName, index + 1, totalFiles)
                     
                     val destFile = File(outputDir, fileName)
+                    if (destFile.exists() && !overwrite) {
+                        continue
+                    }
                     
                     // Ensure the parent directory exists
                     destFile.parentFile?.mkdirs()

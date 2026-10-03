@@ -64,6 +64,11 @@
       android:theme="@style/Theme.DesktopActivityWindow"/>
 
     <activity
+      android:name="org.renpy.android.ToolsActivity"
+      android:exported="false"
+      android:theme="@style/Theme.DesktopActivityWindow"/>
+
+    <activity
       android:name="org.renpy.android.PythonSDLActivity"
       android:exported="true"
       android:process=":renpy"

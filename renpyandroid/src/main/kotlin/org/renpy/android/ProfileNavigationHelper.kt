@@ -47,7 +47,11 @@ object ProfileNavigationHelper {
                 DesktopShortcut(R.string.launcher_browse_external, R.drawable.ic_launcher_external, "external_files"),
                 DesktopShortcut(R.string.launcher_wallpapers, R.drawable.ic_launcher_wallpaper, "wallpapers"),
                 DesktopShortcut(R.string.launcher_settings, R.drawable.ic_launcher_settings, "settings"),
-                DesktopShortcut(R.string.launcher_all_programs, android.R.drawable.ic_menu_sort_by_size, "toggle_expand")
+                DesktopShortcut(
+                    R.string.launcher_all_programs,
+                    android.R.drawable.ic_menu_sort_by_size,
+                    "toggle_expand"
+                )
             )
         } else {
             listOf(
@@ -56,7 +60,11 @@ object ProfileNavigationHelper {
                 DesktopShortcut(R.string.launcher_import_button, R.drawable.ic_launcher_import, "import"),
                 DesktopShortcut(R.string.launcher_export_button, R.drawable.ic_launcher_export, "export"),
                 DesktopShortcut(R.string.launcher_settings, R.drawable.ic_launcher_settings, "settings"),
-                DesktopShortcut(R.string.launcher_all_programs, android.R.drawable.ic_menu_sort_by_size, "toggle_expand")
+                DesktopShortcut(
+                    R.string.launcher_all_programs,
+                    android.R.drawable.ic_menu_sort_by_size,
+                    "toggle_expand"
+                )
             )
         }
     }
@@ -64,6 +72,7 @@ object ProfileNavigationHelper {
     fun getExpandedItems(profile: String): List<DesktopShortcut> {
         return if (profile == PROFILE_RENPY_LAUNCHER) {
             listOf(
+                DesktopShortcut(R.string.title_tools, android.R.drawable.ic_menu_manage, "tools"),
                 DesktopShortcut(R.string.title_tc_blog, R.drawable.ic_tc_blog, "tc_blog"),
                 DesktopShortcut(R.string.title_app_info, android.R.drawable.ic_menu_info_details, "app_info"),
                 DesktopShortcut(R.string.launcher_log_off, android.R.drawable.ic_lock_power_off, "switch_user")
