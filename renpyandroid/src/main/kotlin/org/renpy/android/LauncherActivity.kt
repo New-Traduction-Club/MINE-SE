@@ -392,8 +392,6 @@ class LauncherActivity : BaseActivity() {
         currentLanguage = prefs.getString("language", "English") ?: "English"
         bootSequenceCompleted = savedInstanceState?.getBoolean(STATE_BOOT_SEQUENCE_COMPLETED, false) ?: false
 
-        createLanguageFile(currentLanguage)
-
         binding = LauncherActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupEdgeToEdgeInsets()
@@ -1548,7 +1546,6 @@ class LauncherActivity : BaseActivity() {
                     .putBoolean("is_first_launch", false)
                     .apply()
 
-                createLanguageFile(selectedLang)
                 recreate()
             }
             .setCancelable(false)
@@ -1688,28 +1685,6 @@ class LauncherActivity : BaseActivity() {
         val bootstrapFile = File(gameDir, "zz_android_masbase_bootstrap.rpy")
         if (!bootstrapFile.exists() || bootstrapFile.readText(Charsets.UTF_8) != bootstrapScript) {
             bootstrapFile.writeText(bootstrapScript, Charsets.UTF_8)
-        }
-    }
-
-    private fun createLanguageFile(language: String) {
-        try {
-            val gameDir = File(filesDir, "monikaafterstory-masl-edition/game")
-            if (!gameDir.exists()) {
-                gameDir.mkdirs()
-            }
-
-            gameDir.listFiles { file -> file.name.startsWith("language_") && file.name.endsWith(".txt") }
-                ?.forEach { it.delete() }
-
-            val langParam = when (language) {
-                "Español" -> "spanish"
-                "Português" -> "portuguese"
-                else -> "english"
-            }
-            val langFile = File(gameDir, "language_$langParam.txt")
-            langFile.createNewFile()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

@@ -311,7 +311,6 @@ class SettingsActivity : GameWindowActivity() {
                         .apply()
 
                     BaseActivity.clearCache()
-                    createLanguageFile(selectedLang)
                     currentLanguage = selectedLang
                     binding.txtCurrentLanguage.text = currentLanguage
 
@@ -337,25 +336,4 @@ class SettingsActivity : GameWindowActivity() {
         }
     }
 
-    private fun createLanguageFile(language: String) {
-        try {
-            val gameDir = File(filesDir, "monikaafterstory-masl-edition/game")
-            if (!gameDir.exists()) {
-                gameDir.mkdirs()
-            }
-
-            gameDir.listFiles { file -> file.name.startsWith("language_") && file.name.endsWith(".txt") }
-                ?.forEach { it.delete() }
-
-            val langParam = when (language) {
-                "Español" -> "spanish"
-                "Português" -> "portuguese"
-                else -> "english"
-            }
-            val langFile = File(gameDir, "language_$langParam.txt")
-            langFile.createNewFile()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 }
