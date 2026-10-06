@@ -943,8 +943,6 @@ class LauncherActivity : BaseActivity() {
 
             appendSystemdService("Started Network Manager & Discovery Daemon.")
             delay(380)
-            appendSystemdService("Started Discord RPC IPC Bridge Daemon.")
-            delay(380)
             appendSystemdService("Reached target System Initialization.")
             delay(400)
             appendSystemdService("Started Desktop Display Manager.")
@@ -1172,33 +1170,6 @@ class LauncherActivity : BaseActivity() {
             .start()
     }
 
-    private fun openDiscordRpcWindow() {
-        val prefs = getSharedPreferences(BaseActivity.PREFS_NAME, MODE_PRIVATE)
-        if (!prefs.getBoolean(DiscordRpcManager.PREF_DISCORD_RPC_WARNING_ACCEPTED, false)) {
-            showDiscordRpcWarningDialog(prefs)
-            return
-        }
-        val intent = Intent(this, DiscordRpcActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-        }
-        launchActivityWindow(intent, DiscordRpcActivity::class.java.name)
-    }
-
-    private fun showDiscordRpcWarningDialog(prefs: SharedPreferences) {
-        GameDialogBuilder(this)
-            .setTitle(getString(R.string.discord_rpc_warning_title))
-            .setMessage(getString(R.string.discord_rpc_warning_message))
-            .setPositiveButton(getString(R.string.launcher_proceed)) { _, _ ->
-                prefs.edit()
-                    .putBoolean(DiscordRpcManager.PREF_DISCORD_RPC_WARNING_ACCEPTED, true)
-                    .apply()
-                openDiscordRpcWindow()
-            }
-            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
-                InAppNotifier.show(this, getString(R.string.discord_rpc_warning_denied), true)
-            }
-            .show()
-    }
 
     private fun handleUpdateGame() {
         lifecycleScope.launch {
@@ -1397,9 +1368,6 @@ class LauncherActivity : BaseActivity() {
                 launchActivityWindow(intent, ExtraContentActivity::class.java.name)
             }
 
-            "discord_rpc" -> {
-                openDiscordRpcWindow()
-            }
 
             "backups" -> {
                 val intent = Intent(this, BackupsActivity::class.java).apply {

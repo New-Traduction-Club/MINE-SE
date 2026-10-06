@@ -677,7 +677,6 @@ public class PythonSDLActivity extends SDLActivity {
         } catch (Exception e) {
         }
 
-        DiscordRpcManager.stop();
         super.onDestroy();
 
         if (mStore != null) {
@@ -724,10 +723,6 @@ public class PythonSDLActivity extends SDLActivity {
         }
 
         if (mPendingPictureInPictureEnter) {
-            boolean inPictureInPicture = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
-            if (!inPictureInPicture) {
-                DiscordRpcManager.stop();
-            }
             mPendingPictureInPictureEnter = false;
         }
         long startTime = System.currentTimeMillis();
@@ -954,7 +949,6 @@ public class PythonSDLActivity extends SDLActivity {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
         mPendingPictureInPictureEnter = false;
         if (isInPictureInPictureMode) {
-            DiscordRpcManager.startIfEnabled(this);
             if (mWindowDecorator != null) {
                 mWindowDecorator.notifyState("PIP");
             }
@@ -1029,7 +1023,6 @@ public class PythonSDLActivity extends SDLActivity {
         mPendingPictureInPictureEnter = false;
         boolean inPip = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
         ToolboxManager.setPipMode(this, inPip);
-        DiscordRpcManager.startIfEnabled(this);
 
         // Cancel all scheduled notifications when the user returns to the game
         // Routing is handled by NotificationSchedulerReceiver in the main process.
@@ -1085,10 +1078,6 @@ public class PythonSDLActivity extends SDLActivity {
             mIsInPictureInPictureMode = wasPiP;
         }
 
-        boolean inPictureInPicture = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode();
-        if (!inPictureInPicture && !mPendingPictureInPictureEnter) {
-            DiscordRpcManager.stop();
-        }
         SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
         long start = prefs.getLong("last_session_start", 0);
         if (start > 0) {

@@ -44,14 +44,6 @@
         android:screenOrientation="sensorLandscape"
         android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
 
-    <activity
-        android:name="org.renpy.android.DiscordLoginActivity"
-        android:exported="false" />
-
-    <activity
-        android:name="org.renpy.android.DiscordRpcActivity"
-        android:exported="false"
-        android:theme="@style/Theme.DesktopActivityWindow" />
     
     <activity
       android:name="org.renpy.android.FileExplorerActivity"

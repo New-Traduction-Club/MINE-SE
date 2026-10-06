@@ -103,13 +103,12 @@ class ProfileNavigationTest {
             pinned.map { it.actionId }
         )
 
-        assertEquals(10, expanded.size)
+        assertEquals(9, expanded.size)
         assertEquals(
             listOf(
                 "external_files",
                 "update_game",
                 "extra_content",
-                "discord_rpc",
                 "backups",
                 "wallpapers",
                 "tc_blog",
@@ -119,7 +118,7 @@ class ProfileNavigationTest {
             ),
             expanded.map { it.actionId }
         )
-        assertEquals(R.string.title_experiments, expanded[8].titleResId)
+        assertEquals(R.string.title_experiments, expanded[7].titleResId)
     }
 
     @Test
@@ -153,7 +152,6 @@ class ProfileNavigationTest {
             "export",
             "update_game",
             "extra_content",
-            "discord_rpc",
             "backups"
         )
 

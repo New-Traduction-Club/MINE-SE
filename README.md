@@ -41,8 +41,6 @@ Unrpyc script decompiler, by [CensoredUsername](https://github.com/CensoredUsern
 
 Chaquopy embedded Python SDK for Android, developed by [Chaquo](https://github.com/chaquo/chaquopy).
 
-[Kizzy](https://github.com/dead8309/Kizzy), providing the Android Discord Rich Presence client library.
-
 Team Salvato and the Monika After Story team, whose creative work inspired the origins of this launcher.
 
 ## License
