@@ -606,6 +606,13 @@
     <string name="mine_launcher_cover_art_removed">Capa removida</string>
     <string name="mine_launcher_cover_art_crop_title">Ajustar capa</string>
 
+    <string name="mine_launcher_delete_game_option">Excluir jogo</string>
+    <string name="mine_launcher_delete_game_desc">Excluir os arquivos e dados do jogo</string>
+    <string name="mine_launcher_delete_game_confirm_title">Excluir \"%1$s\"?</string>
+    <string name="mine_launcher_delete_game_confirm_message">Tem certeza de que deseja excluir permanentemente este jogo? Todos os arquivos e dados salvos serão removidos. Esta ação não pode ser desfeita.</string>
+    <string name="mine_launcher_game_deleted">\"%1$s\" foi excluído</string>
+    <string name="mine_launcher_delete_game_failed">Falha ao excluir \"%1$s\"</string>
+
     <string name="title_tc_blog">TC Blog</string>
     <string name="tc_blog_tab_all">Tudo</string>
     <string name="tc_blog_back_to_feed">Voltar</string>

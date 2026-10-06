@@ -590,6 +590,13 @@
     <string name="mine_launcher_cover_art_removed">Cover art removed</string>
     <string name="mine_launcher_cover_art_crop_title">Adjust Cover Art</string>
 
+    <string name="mine_launcher_delete_game_option">Uninstall Game</string>
+    <string name="mine_launcher_delete_game_desc">Permanently remove game files and data</string>
+    <string name="mine_launcher_delete_game_confirm_title">Uninstall \"%1$s\"?</string>
+    <string name="mine_launcher_delete_game_confirm_message">Are you sure you want to uninstall this game? All game files and saved data will be removed. This action cannot be undone.</string>
+    <string name="mine_launcher_game_deleted">\"%1$s\" has been uninstalled</string>
+    <string name="mine_launcher_delete_game_failed">Failed to uninstall \"%1$s\"</string>
+
     <string name="title_tc_blog">TC Blog</string>
     <string name="tc_blog_tab_all">All</string>
     <string name="tc_blog_back_to_feed">Back</string>

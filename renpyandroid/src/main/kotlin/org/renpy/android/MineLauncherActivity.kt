@@ -971,6 +971,11 @@ class MineLauncherActivity : GameWindowActivity() {
             transitionTo(SettingsScreen.ENV_VARS)
         }
 
+        dialogBinding.rowSettingDeleteGame.setOnClickListener {
+            SoundEffects.playClick(this)
+            showDeleteGameConfirmationDialog(gameFolder, dialog)
+        }
+
         val initialTitleRes = when (initialScreen) {
             SettingsScreen.MENU -> R.string.mine_launcher_options_title
             SettingsScreen.EDIT_TITLE -> R.string.mine_launcher_edit_title
@@ -1018,6 +1023,50 @@ class MineLauncherActivity : GameWindowActivity() {
         dialog.show()
 
         transitionTo(initialScreen, animate = false)
+    }
+
+    private fun showDeleteGameConfirmationDialog(gameFolder: File, parentDialog: AlertDialog?) {
+        val gameTitle = getGameTitle(gameFolder)
+        GameDialogBuilder(this)
+            .setTitle(getString(R.string.mine_launcher_delete_game_confirm_title, gameTitle))
+            .setMessage(getString(R.string.mine_launcher_delete_game_confirm_message))
+            .setPositiveButton(getString(R.string.delete)) { confirmDialog, _ ->
+                confirmDialog.dismiss()
+                parentDialog?.dismiss()
+
+                lifecycleScope.launch {
+                    val deleted = withContext(Dispatchers.IO) {
+                        try {
+                            gameFolder.deleteRecursively()
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
+
+                    if (deleted) {
+                        coverArtCache.remove(gameFolder.absolutePath)
+                        ambientBlurCache.remove(gameFolder.absolutePath)
+
+                        if (selectedGame?.absolutePath == gameFolder.absolutePath) {
+                            showLibraryView()
+                        }
+
+                        loadGames()
+                        InAppNotifier.show(
+                            this@MineLauncherActivity,
+                            getString(R.string.mine_launcher_game_deleted, gameTitle)
+                        )
+                    } else {
+                        InAppNotifier.show(
+                            this@MineLauncherActivity,
+                            getString(R.string.mine_launcher_delete_game_failed, gameTitle),
+                            true
+                        )
+                    }
+                }
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
     private fun showEditTitleDialog(gameFolder: File, onDismissed: (() -> Unit)? = null) {
