@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets
 class TcBlogApiClient(private val context: Context) {
 
     companion object {
-        private const val BASE_URL = "https://traduction-club.live/api/masl/"
+        private const val BASE_URL = "https://traduction-club.live/api/mine/"
         private const val CONNECT_TIMEOUT_MS = 10000
         private const val READ_TIMEOUT_MS = 15000
     }
