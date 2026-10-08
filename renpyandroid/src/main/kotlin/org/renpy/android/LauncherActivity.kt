@@ -78,6 +78,7 @@ class LauncherActivity : BaseActivity() {
     companion object {
         const val EXTRA_FROM_LOGIN = "extra_from_login"
         const val EXTRA_LOGGED_IN_PROFILE = "extra_logged_in_profile"
+        const val PREF_WELCOME_SCREEN_SHOWN = "welcome_screen_shown"
         private const val STATE_BOOT_SEQUENCE_COMPLETED = "state_boot_sequence_completed"
         private const val REQUEST_CODE_EXPORT_SAVES = 2001
         private const val REQUEST_CODE_IMPORT_SAVES = 2002
@@ -598,7 +599,9 @@ class LauncherActivity : BaseActivity() {
             resetStartMenuState()
             lifecycleScope.launch {
                 delay(300)
-                showStartMenuAnimated()
+                showStartMenuAnimated {
+                    checkAndShowWelcomeScreen()
+                }
             }
         }
     }
@@ -635,7 +638,9 @@ class LauncherActivity : BaseActivity() {
             resetStartMenuState()
             lifecycleScope.launch {
                 delay(300)
-                showStartMenuAnimated()
+                showStartMenuAnimated {
+                    checkAndShowWelcomeScreen()
+                }
             }
         }
 
@@ -997,7 +1002,9 @@ class LauncherActivity : BaseActivity() {
                             binding.bootScreenLayout.alpha = 1f
                             lifecycleScope.launch {
                                 delay(300)
-                                showStartMenuAnimated()
+                                showStartMenuAnimated {
+                                    checkAndShowWelcomeScreen()
+                                }
                             }
                         }
                         .start()
@@ -1101,8 +1108,9 @@ class LauncherActivity : BaseActivity() {
         updateStartMenuAdapter()
     }
 
-    private fun showStartMenuAnimated() {
+    private fun showStartMenuAnimated(onAnimationEnd: (() -> Unit)? = null) {
         if (binding.startMenuPanel.visibility == View.VISIBLE && binding.startMenuPanel.translationY == 0f) {
+            onAnimationEnd?.invoke()
             return
         }
         resetStartMenuState()
@@ -1119,7 +1127,20 @@ class LauncherActivity : BaseActivity() {
             .translationY(0f)
             .setDuration(400)
             .setInterpolator(DecelerateInterpolator())
+            .withEndAction {
+                onAnimationEnd?.invoke()
+            }
             .start()
+    }
+
+    private fun checkAndShowWelcomeScreen() {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val hasSeenWelcome = prefs.getBoolean(PREF_WELCOME_SCREEN_SHOWN, false)
+        if (!hasSeenWelcome) {
+            prefs.edit().putBoolean(PREF_WELCOME_SCREEN_SHOWN, true).apply()
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun showExpandedMenuAnimated() {

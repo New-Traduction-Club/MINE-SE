@@ -606,4 +606,7 @@
     <string name="tc_blog_loading">Loading...</string>
     <string name="tc_blog_error_loading">Failed to load content. Please check your internet connection.</string>
     <string name="tc_blog_read_more">Read →</string>
+
+    <string name="title_welcome">Welcome!</string>
+    <string name="welcome_body_text"></string>
 </resources>

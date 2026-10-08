@@ -621,4 +621,7 @@
     <string name="tc_blog_loading">Cargando...</string>
     <string name="tc_blog_error_loading">Error al cargar. Por favor, comprueba tu conexión a internet.</string>
     <string name="tc_blog_read_more">Leer →</string>
+
+    <string name="title_welcome">¡Bienvenido/a!</string>
+    <string name="welcome_body_text"></string>
 </resources>

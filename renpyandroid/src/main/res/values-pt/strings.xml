@@ -622,4 +622,7 @@
     <string name="tc_blog_loading">Carregando...</string>
     <string name="tc_blog_error_loading">Falha ao carregar conteúdo. Por favor, verifique sua conexão com a internet.</string>
     <string name="tc_blog_read_more">Ler →</string>
+
+    <string name="title_welcome">Bem-vindo/a!</string>
+    <string name="welcome_body_text"></string>
 </resources>
