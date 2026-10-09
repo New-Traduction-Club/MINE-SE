@@ -10,8 +10,8 @@ class FileExplorerFilterTest {
     @Test
     fun testHiddenSystemFilesIdentification() {
         assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/chaquopy")))
-        assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/generated.lock")))
-        assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/profileinstalled")))
+        assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/generatefid.lock")))
+        assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/profileInstalled")))
         assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/PersistedInstallation.xml")))
         assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/PersistedInstallation.temp")))
         assertTrue(FileExplorerViewModel.isHiddenSystemItem(File("/mock/path/PersistedInstallation.")))

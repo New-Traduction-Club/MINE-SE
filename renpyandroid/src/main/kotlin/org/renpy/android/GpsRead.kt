@@ -39,7 +39,7 @@ object GpsRead {
 
     fun getValue(context: Context): Boolean = read(context)
 
-    internal fun parseFirstLine(inputStream: InputStream): Boolean {
+    fun parseFirstLine(inputStream: InputStream): Boolean {
         return BufferedReader(InputStreamReader(inputStream, Charsets.UTF_8)).use { reader ->
             val firstLine = reader.readLine()?.trim()
             when (firstLine?.lowercase()) {

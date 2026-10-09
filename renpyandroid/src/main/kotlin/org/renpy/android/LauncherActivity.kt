@@ -80,6 +80,7 @@ class LauncherActivity : BaseActivity() {
         const val EXTRA_LOGGED_IN_PROFILE = "extra_logged_in_profile"
         const val PREF_WELCOME_SCREEN_SHOWN = "welcome_screen_shown"
         private const val STATE_BOOT_SEQUENCE_COMPLETED = "state_boot_sequence_completed"
+        private const val STATE_PENDING_FROM_LOGIN = "state_pending_from_login"
         private const val REQUEST_CODE_EXPORT_SAVES = 2001
         private const val REQUEST_CODE_IMPORT_SAVES = 2002
         private const val MAX_EXPANDED_ITEMS_PER_COLUMN = 6
@@ -120,6 +121,7 @@ class LauncherActivity : BaseActivity() {
     private var currentLanguage: String = ""
     private var isUiInitialized = false
     private var bootSequenceCompleted = false
+    private var pendingFromLogin = false
 
     private var progressDialog: AlertDialog? = null
     private var progressIndicator: android.widget.ProgressBar? = null
@@ -392,6 +394,7 @@ class LauncherActivity : BaseActivity() {
         WorkManager.getInstance(applicationContext).cancelAllWorkByTag(NotificationWorker.WORK_TAG)
         currentLanguage = prefs.getString("language", "English") ?: "English"
         bootSequenceCompleted = savedInstanceState?.getBoolean(STATE_BOOT_SEQUENCE_COMPLETED, false) ?: false
+        pendingFromLogin = savedInstanceState?.getBoolean(STATE_PENDING_FROM_LOGIN, false) ?: false
 
         binding = LauncherActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -586,23 +589,8 @@ class LauncherActivity : BaseActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleShortcutIntent(intent)
-        intent.getStringExtra(EXTRA_LOGGED_IN_PROFILE)?.let { profile ->
-            intent.removeExtra(EXTRA_LOGGED_IN_PROFILE)
-            val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-            prefs.edit().putString("active_user_profile", profile).apply()
-            AutoLoginHelper.recordLastUsedProfile(this, profile)
-            updateStartMenuAdapter()
-            setupDynamicShortcuts(prefs.getBoolean("is_setup_completed", false))
-        }
         if (intent.getBooleanExtra(EXTRA_FROM_LOGIN, false)) {
-            intent.removeExtra(EXTRA_FROM_LOGIN)
-            resetStartMenuState()
-            lifecycleScope.launch {
-                delay(300)
-                showStartMenuAnimated {
-                    checkAndShowWelcomeScreen()
-                }
-            }
+            pendingFromLogin = true
         }
     }
 
@@ -618,6 +606,9 @@ class LauncherActivity : BaseActivity() {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val savedLang = prefs.getString("language", "English") ?: ""
         if (currentLanguage != savedLang) {
+            if (intent.getBooleanExtra(EXTRA_FROM_LOGIN, false)) {
+                pendingFromLogin = true
+            }
             recreate()
             return
         }
@@ -633,7 +624,9 @@ class LauncherActivity : BaseActivity() {
             WallpaperManager.applyWallpaper(this, binding.root, WallpaperManager.getCurrentDesktopTarget(this))
         }
 
-        if (intent.getBooleanExtra(EXTRA_FROM_LOGIN, false)) {
+        val isFromLogin = intent.getBooleanExtra(EXTRA_FROM_LOGIN, false) || pendingFromLogin
+        if (isFromLogin) {
+            pendingFromLogin = false
             intent.removeExtra(EXTRA_FROM_LOGIN)
             resetStartMenuState()
             lifecycleScope.launch {
@@ -665,6 +658,7 @@ class LauncherActivity : BaseActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_BOOT_SEQUENCE_COMPLETED, bootSequenceCompleted)
+        outState.putBoolean(STATE_PENDING_FROM_LOGIN, pendingFromLogin)
         super.onSaveInstanceState(outState)
     }
 
@@ -799,6 +793,9 @@ class LauncherActivity : BaseActivity() {
 
         if (!bootSequenceCompleted) {
             startBootSequence()
+        } else if (pendingFromLogin || intent.getBooleanExtra(EXTRA_FROM_LOGIN, false)) {
+            binding.bootScreenLayout.visibility = View.GONE
+            binding.startMenuPanel.visibility = View.GONE
         } else {
             binding.bootScreenLayout.visibility = View.GONE
             ensureStartMenuVisible()
