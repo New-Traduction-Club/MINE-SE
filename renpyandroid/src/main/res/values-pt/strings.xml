@@ -625,4 +625,8 @@
 
     <string name="title_welcome">Bem-vindo/a!</string>
     <string name="welcome_body_text"></string>
+
+    <string name="settings_category_about">Sobre</string>
+    <string name="settings_welcome_screen_title">Tela de boas-vindas</string>
+    <string name="settings_welcome_screen_desc">Ver a tela de boas-vindas novamente</string>
 </resources>

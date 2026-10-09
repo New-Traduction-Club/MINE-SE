@@ -624,4 +624,8 @@
 
     <string name="title_welcome">¡Bienvenido/a!</string>
     <string name="welcome_body_text"></string>
+
+    <string name="settings_category_about">Acerca de</string>
+    <string name="settings_welcome_screen_title">Pantalla de bienvenida</string>
+    <string name="settings_welcome_screen_desc">Ver la pantalla de bienvenida de nuevo</string>
 </resources>

@@ -1,6 +1,7 @@
 package org.renpy.android
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 
@@ -30,6 +31,7 @@ class SettingsActivity : GameWindowActivity() {
         setupThemeUI(prefs)
         setupWindowModeUI()
         setupNetworkUI(prefs)
+        setupWelcomeScreenUI()
     }
 
     private fun setupAutoLoginUI(prefs: android.content.SharedPreferences) {
@@ -73,6 +75,14 @@ class SettingsActivity : GameWindowActivity() {
 
         binding.switchWifiOnly.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("wifi_only", isChecked).apply()
+        }
+    }
+
+    private fun setupWelcomeScreenUI() {
+        binding.cardWelcomeScreen.setOnClickListener {
+            SoundEffects.playClick(this)
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
         }
     }
 
