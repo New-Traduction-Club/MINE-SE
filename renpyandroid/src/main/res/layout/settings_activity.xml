@@ -269,7 +269,7 @@
 
                     <TextView
                         android:id="@+id/txtCurrentWindowMode"
-                        android:text="@string/window_mode_maximized"
+                        android:text="@string/window_mode_windowed"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

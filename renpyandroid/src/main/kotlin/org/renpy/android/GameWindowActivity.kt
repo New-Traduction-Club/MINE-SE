@@ -70,7 +70,7 @@ abstract class GameWindowActivity : BaseActivity() {
         val isWindowedPreferred = when (forcedMode) {
             WindowMode.WINDOWED -> true
             WindowMode.MAXIMIZED -> false
-            null -> prefs.getString(KEY_WINDOW_MODE, null) == "windowed"
+            null -> prefs.getString(KEY_WINDOW_MODE, "windowed") == "windowed"
         }
 
         val virtualHeight = if (isWindowedPreferred) 580f else 490f
@@ -399,7 +399,6 @@ abstract class GameWindowActivity : BaseActivity() {
         }
 
         super.setContentView(rootLayout)
-        promptWindowModeIfNeeded(rootLayout)
     }
 
     override fun setContentView(view: View?) {
@@ -425,7 +424,6 @@ abstract class GameWindowActivity : BaseActivity() {
         }
 
         super.setContentView(rootLayout)
-        promptWindowModeIfNeeded(rootLayout)
     }
 
     override fun setContentView(view: View?, params: ViewGroup.LayoutParams?) {
@@ -454,8 +452,8 @@ abstract class GameWindowActivity : BaseActivity() {
         overrideWindowMode()?.let { return it }
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return when (prefs.getString(KEY_WINDOW_MODE, null)) {
-            "windowed" -> WindowMode.WINDOWED
-            else -> WindowMode.MAXIMIZED
+            "maximized" -> WindowMode.MAXIMIZED
+            else -> WindowMode.WINDOWED
         }
     }
 
@@ -531,21 +529,6 @@ abstract class GameWindowActivity : BaseActivity() {
             allowCancel = true,
             recreateOnChange = recreateOnChange,
             onApplied = onApplied
-        )
-    }
-
-    private fun promptWindowModeIfNeeded(rootLayout: ViewGroup) {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        if (prefs.contains(KEY_WINDOW_MODE)) return
-
-        // Keep maximized as the default when the first-run prompt is dismissed
-        setWindowMode(WindowMode.MAXIMIZED)
-
-        showWindowModeDialog(
-            rootLayout,
-            allowCancel = true,
-            recreateOnChange = true,
-            onApplied = null
         )
     }
 
