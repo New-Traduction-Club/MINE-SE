@@ -31,7 +31,7 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
 
     private val _statusMessage = MutableLiveData<String>()
     val statusMessage: LiveData<String> = _statusMessage
-    
+
     private var clipboardFiles: List<File> = emptyList()
     private var isCutOperation: Boolean = false
     private val _hasClipboard = MutableLiveData<Boolean>(false)
@@ -39,17 +39,49 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
 
     private val _isImportingZip = MutableLiveData<Boolean>(false)
     val isImportingZip: LiveData<Boolean> = _isImportingZip
+
     @Volatile
     private var activeSearchToken: Long = 0L
+
+    companion object {
+        fun isHiddenSystemItem(file: File): Boolean {
+            val name = file.name
+            return name == "chaquopy" ||
+                    name == "generatefid.lock" ||
+                    name == "profileInstalled" ||
+                    name.startsWith("PersistedInstallation.")
+        }
+    }
 
     fun loadDirectory(path: String) {
         val file = File(path)
         if (file.exists() && file.isDirectory) {
             _currentDir.postValue(file)
             viewModelScope.launch(Dispatchers.IO) {
-                val fileList = file.listFiles()?.sortedWith(
+                val app = getApplication<Application>()
+                val prefs = app.getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE)
+                val showHidden = prefs.getBoolean(BaseActivity.KEY_SHOW_HIDDEN_FILES, false)
+                val filesDirCanonical = try {
+                    app.filesDir.canonicalFile
+                } catch (_: Exception) {
+                    app.filesDir
+                }
+                val isFilesDirRoot = try {
+                    file.canonicalFile == filesDirCanonical
+                } catch (_: Exception) {
+                    false
+                }
+
+                val rawList = file.listFiles() ?: emptyArray()
+                val filteredList = if (!showHidden && isFilesDirRoot) {
+                    rawList.filterNot { isHiddenSystemItem(it) }
+                } else {
+                    rawList.toList()
+                }
+
+                val fileList = filteredList.sortedWith(
                     compareBy<File>({ !it.isDirectory }, { it.name.lowercase() })
-                ) ?: emptyList()
+                )
                 _files.postValue(fileList)
             }
         }
@@ -68,12 +100,40 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
         val token = System.nanoTime().also { activeSearchToken = it }
 
         viewModelScope.launch(Dispatchers.IO) {
+            val app = getApplication<Application>()
+            val prefs = app.getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE)
+            val showHidden = prefs.getBoolean(BaseActivity.KEY_SHOW_HIDDEN_FILES, false)
+            val filesDirCanonical = try {
+                app.filesDir.canonicalFile
+            } catch (_: Exception) {
+                app.filesDir
+            }
+
             val results = if (normalizedQuery.isEmpty()) {
                 emptyList()
             } else {
                 current.walkTopDown()
+                    .onEnter { dir ->
+                        if (!showHidden) {
+                            val parent = try {
+                                dir.parentFile?.canonicalFile
+                            } catch (_: Exception) {
+                                dir.parentFile
+                            }
+                            if (parent == filesDirCanonical && isHiddenSystemItem(dir)) {
+                                return@onEnter false
+                            }
+                        }
+                        true
+                    }
                     .filter { node ->
-                        node != current && node.name.lowercase().contains(normalizedQuery)
+                        val parent = try {
+                            node.parentFile?.canonicalFile
+                        } catch (_: Exception) {
+                            node.parentFile
+                        }
+                        val isHiddenRootItem = !showHidden && parent == filesDirCanonical && isHiddenSystemItem(node)
+                        node != current && !isHiddenRootItem && node.name.lowercase().contains(normalizedQuery)
                     }
                     .sortedWith(compareBy<File>({ !it.isDirectory }, { it.name.lowercase() }))
                     .toList()
@@ -84,7 +144,7 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
             }
         }
     }
-    
+
     fun createFolder(name: String) {
         val current = _currentDir.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
@@ -125,7 +185,7 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
                     postMessage(getString(R.string.item_already_exists))
                     return@launch
                 }
-                
+
                 if (file.renameTo(newFile)) {
                     refreshCurrentDir()
                     postMessage(getString(R.string.renamed_successfully))
@@ -142,7 +202,7 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
         viewModelScope.launch(Dispatchers.IO) {
             var successCount = 0
             var failCount = 0
-            
+
             val sortedFiles = filesToDelete.sortedByDescending { it.absolutePath.length }
 
             sortedFiles.forEach { file ->
@@ -158,9 +218,9 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
                     }
                 }
             }
-            
+
             refreshCurrentDir()
-            
+
             if (failCount > 0) {
                 postMessage(getString(R.string.deleted_items_mixed, successCount, failCount))
             } else {
@@ -173,7 +233,12 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
         clipboardFiles = files
         isCutOperation = isCut
         _hasClipboard.value = true
-        postMessage(if (isCut) getString(R.string.items_cut, files.size) else getString(R.string.items_copied, files.size))
+        postMessage(
+            if (isCut) getString(R.string.items_cut, files.size) else getString(
+                R.string.items_copied,
+                files.size
+            )
+        )
     }
 
     fun pasteToCurrentDir() {
@@ -197,11 +262,11 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
                         file.copyRecursively(dest, overwrite = true)
                     }
                 }
-                
+
                 if (isCutOperation) {
                     clearClipboard()
                 }
-                
+
                 refreshCurrentDir()
                 postMessage(getString(R.string.paste_success))
             } catch (e: Exception) {
@@ -209,17 +274,17 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
             }
         }
     }
-    
+
     private fun clearClipboard() {
         clipboardFiles = emptyList()
         isCutOperation = false
         _hasClipboard.postValue(false)
     }
 
-    private fun refreshCurrentDir() {
+    fun refreshCurrentDir() {
         _currentDir.value?.let { loadDirectory(it.absolutePath) }
     }
-    
+
     private fun postMessage(msg: String) {
         _statusMessage.postValue(msg)
     }
@@ -279,7 +344,7 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
 
     fun importZip(uri: android.net.Uri, context: android.content.Context) {
         val destDir = _currentDir.value ?: return
-        
+
         _isImportingZip.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
             val tempZipObj = File.createTempFile("import_temp", ".zip", context.cacheDir)
@@ -289,16 +354,16 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
                         input.copyTo(output)
                     }
                 }
-                
+
                 java.util.zip.ZipFile(tempZipObj).use { zip ->
                     val entries = zip.entries()
                     while (entries.hasMoreElements()) {
                         val entry = entries.nextElement()
                         val outFile = File(destDir, entry.name)
-                        
+
                         // Prevent Zip Slip
                         if (!outFile.canonicalPath.startsWith(destDir.canonicalPath)) {
-                             // Skip malicious entry
+                            // Skip malicious entry
                         } else {
                             if (entry.isDirectory) {
                                 outFile.mkdirs()
@@ -313,10 +378,10 @@ class FileExplorerViewModel(application: Application) : AndroidViewModel(applica
                         }
                     }
                 }
-                
+
                 refreshCurrentDir()
                 postMessage(getString(R.string.status_import_completed))
-                
+
             } catch (e: Exception) {
                 postMessage(getString(R.string.import_failed, e.message ?: ""))
             } finally {

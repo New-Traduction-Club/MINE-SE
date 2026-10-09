@@ -97,6 +97,7 @@ abstract class BaseActivity : AppCompatActivity() {
         const val PREFS_NAME = "app_prefs"
         const val KEY_DARK_MODE = "dark_mode_enabled"
         const val KEY_WINDOW_MODE = "window_mode"
+        const val KEY_SHOW_HIDDEN_FILES = "show_hidden_files"
 
         private var cachedLanguage: String? = null
         private var cachedLocale: Locale? = null

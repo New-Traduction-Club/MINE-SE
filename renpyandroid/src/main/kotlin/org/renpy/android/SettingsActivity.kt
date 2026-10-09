@@ -30,6 +30,7 @@ class SettingsActivity : GameWindowActivity() {
         setupAutoLoginUI(prefs)
         setupThemeUI(prefs)
         setupWindowModeUI()
+        setupShowHiddenFilesUI(prefs)
         setupNetworkUI(prefs)
         setupWelcomeScreenUI()
     }
@@ -114,6 +115,19 @@ class SettingsActivity : GameWindowActivity() {
             showWindowModeChooser(recreateOnChange = true) {
                 binding.txtCurrentWindowMode.text = windowModeLabel()
             }
+        }
+    }
+
+    private fun setupShowHiddenFilesUI(prefs: android.content.SharedPreferences) {
+        val showHidden = prefs.getBoolean(BaseActivity.KEY_SHOW_HIDDEN_FILES, false)
+        binding.switchShowHiddenFiles.isChecked = showHidden
+
+        binding.switchShowHiddenFiles.setOnCheckedChangeListener { _, isChecked ->
+            prefs.edit().putBoolean(BaseActivity.KEY_SHOW_HIDDEN_FILES, isChecked).apply()
+        }
+
+        binding.cardShowHiddenFiles.setOnClickListener {
+            binding.switchShowHiddenFiles.toggle()
         }
     }
 

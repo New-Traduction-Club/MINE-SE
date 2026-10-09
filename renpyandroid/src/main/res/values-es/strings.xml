@@ -628,4 +628,7 @@
     <string name="settings_category_about">Acerca de</string>
     <string name="settings_welcome_screen_title">Pantalla de bienvenida</string>
     <string name="settings_welcome_screen_desc">Ver la pantalla de bienvenida de nuevo</string>
+
+    <string name="settings_show_hidden_files_title">Mostrar archivos ocultos</string>
+    <string name="settings_show_hidden_files_desc">Mostrar archivos del sistema en el Explorador de archivos</string>
 </resources>

@@ -1,6 +1,7 @@
 package org.renpy.android
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -996,6 +997,18 @@ open class FileExplorerActivity : GameWindowActivity() {
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
     private val Int.sp get() = this.toFloat()
+
+    private var lastShowHiddenFiles: Boolean? = null
+
+    override fun onResume() {
+        super.onResume()
+        val prefs = getSharedPreferences(BaseActivity.PREFS_NAME, Context.MODE_PRIVATE)
+        val currentShowHidden = prefs.getBoolean(BaseActivity.KEY_SHOW_HIDDEN_FILES, false)
+        if (lastShowHiddenFiles != null && lastShowHiddenFiles != currentShowHidden) {
+            viewModel.refreshCurrentDir()
+        }
+        lastShowHiddenFiles = currentShowHidden
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
